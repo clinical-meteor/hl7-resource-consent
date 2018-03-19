@@ -26,14 +26,6 @@ export class ConsentTable extends React.Component {
         },
         cell: {
           paddingTop: '16px'
-        },
-        avatar: {
-          // color: rgb(255, 255, 255);
-          backgroundColor: 'rgb(188, 188, 188)',
-          userSelect: 'none',
-          borderRadius: '2px',
-          height: '40px',
-          width: '40px'
         }
       },
       selected: [],
@@ -43,8 +35,8 @@ export class ConsentTable extends React.Component {
     let query = {};
     let options = {};
     // number of items in the table should be set globally
-    if (Meteor.settings && Meteor.settings.public && Meteor.settings.public.defaults && Meteor.settings.public.defaults.paginationLimit) {
-      options.limit = Meteor.settings.public.defaults.paginationLimit;
+    if (get(Meteor, 'settings.public.defaults.paginationLimit')) {
+      options.limit = get(Meteor, 'settings.public.defaults.paginationLimit');
     }
     // but can be over-ridden by props being more explicit
     if(this.props.limit){
@@ -52,31 +44,21 @@ export class ConsentTable extends React.Component {
     }
 
     // data.consents = [];
-    data.consents = Consents.find(query, options).map(function(person){
+    data.consents = Consents.find(query, options).map(function(document){
       let result = {
-        _id: person._id,
-        active: person.active.toString(),
-        gender: person.gender,
-        name: '',
-        mrn: '',
-        // there's an off-by-1 error between momment() and Date() that we want
-        // to account for when converting back to a string
-        birthDate: '',
-        photo: "/thumbnail-blank.png",
-        initials: 'abc'
+        _id: document._id,
+        dateTime: moment(get(document, 'dateTime', null)).format("YYYY-MM-DD"),
+        status: get(document, 'status', ''),
+        patientReference: get(document, 'patient.reference', '').split('/')[1].toUpperCase(),
+        consentingParty: get(document, 'consentingParty.0.reference', '').split('/')[1].toUpperCase(),
+        organization: get(document, 'organization.0.reference', '').split('/')[1].toUpperCase(),
+        policyRule: get(document, 'policyRule', ''),
+        exceptType: get(document, 'except.0.type', ''),
+        exceptAction: get(document, 'except.0.action.0.coding.0.code', ''),
+        exceptClass: get(document, 'except.0.class.0.code', ''),
+        start: get(document, 'period.start', ''),
+        end: get(document, 'period.end', '')
       };
-      if (person.birthDate) {
-        result.birthDate = moment(person.birthDate).add(1, 'days').format("YYYY-MM-DD")
-      }
-      if (person.name && person.name[0] && person.name[0].text) {
-        result.name = person.name[0].text;
-      }
-      if (person.photo && person.photo[0] && person.photo[0].url) {
-        result.photo = person.photo[0].url;
-      }
-      if (person.identifier && person.identifier[0] && person.identifier[0].value) {
-        result.mrn = person.identifier[0].value;
-      }
       return result;
     });
 
@@ -100,76 +82,38 @@ export class ConsentTable extends React.Component {
     Session.set('selectedConsent', id);
     Session.set('consentPageTabIndex', 2);
   }
-  renderRowAvatarHeader(){
-    if (Meteor.settings.public.defaults.avatars) {
-      return (
-        <th className='avatar'>photo</th>
-      );
-    }
-  }
-  renderRowAvatar(consent, avatarStyle){
-    if (Meteor.settings.public.defaults.avatars) {
-      return (
-        <td className='avatar'>
-          <img src={consent.photo} style={avatarStyle}/>
-        </td>
-      );
-    }
-  }
-  onSend(id){
-    let consent = Consents.findOne({_id: id});
-
-    console.log("ConsentTable.onSend()", consent);
-
-    var httpEndpoint = "http://localhost:8080";
-    if (Meteor.settings && Meteor.settings.public && Meteor.settings.public.interfaces && Meteor.settings.public.interfaces.default && Meteor.settings.public.interfaces.default.channel && Meteor.settings.public.interfaces.default.channel.endpoint) {
-      httpEndpoint = Meteor.settings.public.interfaces.default.channel.endpoint;
-    }
-    HTTP.post(httpEndpoint + '/Consent', {
-      data: consent
-    }, function(error, result){
-      if (error) {
-        console.log("error", error);
-      }
-      if (result) {
-        console.log("result", result);
-      }
-    });
-  }
   render () {
     let tableRows = [];
     for (var i = 0; i < this.data.consents.length; i++) {
       tableRows.push(
         <tr key={i} className="consentRow" style={{cursor: "pointer"}}>
 
-          { this.renderRowAvatar(this.data.consents[i], this.data.style.avatar) }
-
-          <td className='name' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell}>{this.data.consents[i].name }</td>
-          <td className='gender' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell}>{this.data.consents[i].gender}</td>
-          <td className='birthDate' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.consents[i].birthDate }</td>
-          <td className='isActive' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cellHideOnPhone}>{this.data.consents[i].active}</td>
-          <td className='id' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cellHideOnPhone}><span className="barcode">{this.data.consents[i]._id}</span></td>
-          <td className='mrn' style={this.data.style.cellHideOnPhone}>{this.data.consents[i].mrn}</td>
-          <td className='sendButton' style={this.data.style.hideOnPhone}><FlatButton label="send" onClick={this.onSend.bind('this', this.data.consents[i]._id)}/></td>
+          <td className='date' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.consents[i].dateTime }</td>
+          <td className='status' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell}>{this.data.consents[i].status}</td>
+          <td className='patientReference' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell} >{this.data.consents[i].patientReference }</td>
+          <td className='consentingParty' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell} >{this.data.consents[i].consentingParty}</td>
+          <td className='organization' style={this.data.style.cell} >{this.data.consents[i].organization}</td>
+          <td className='policyRule' style={this.data.style.cell} >{this.data.consents[i].policyRule}</td>
+          <td className='exceptType' style={this.data.style.cell} >{this.data.consents[i].exceptType}</td>
+          <td className='exceptAction' style={this.data.style.cell} >{this.data.consents[i].exceptAction}</td>
+          <td className='exceptClass' style={this.data.style.cell} >{this.data.consents[i].exceptClass}</td>
         </tr>
       );
     }
-
 
     return(
       <Table id='consentsTable' hover >
         <thead>
           <tr>
-
-            { this.renderRowAvatarHeader() }
-
-            <th className='name'>name</th>
-            <th className='gender'>gender</th>
-            <th className='birthdate' style={{minWidth: '100px'}}>birthdate</th>
-            <th className='isActive' style={this.data.style.hideOnPhone}>active</th>
-            <th className='id' style={this.data.style.hideOnPhone}>_id</th>
-            <th className='mrn' style={this.data.style.hideOnPhone}>mrn</th>
-            <th className='sendButton' style={this.data.style.hideOnPhone}></th>
+            <th className='name' style={{minWidth: '100px'}}>date</th>
+            <th className='status'>status</th>
+            <th className='patientReference'>patient</th>
+            <th className='consentingParty' >consenting party</th>
+            <th className='organization' >organization</th>
+            <th className='rule' >rule</th>
+            <th className='type' >type</th>
+            <th className='action' >action</th>
+            <th className='class' >class</th>
           </tr>
         </thead>
         <tbody>

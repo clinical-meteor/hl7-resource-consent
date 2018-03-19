@@ -1,5 +1,5 @@
 
-import ConsentsPage from './client/tConsentsPage';
+import ConsentsPage from './client/ConsentsPage';
 import ConsentTable from './client/ConsentTable';
 import { Consent, Consents, ConsentSchema } from './lib/Consents';
 

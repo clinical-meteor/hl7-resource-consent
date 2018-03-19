@@ -1,7 +1,5 @@
 import { CardActions, CardText } from 'material-ui/Card';
 import { get, has, set } from 'lodash';
-// import { insertConsent, removeConsentById, updateConsent } from '/imports/ui/workflows/consents/methods';
-// import { insertConsent, removeConsentById, updateConsent } from 'meteor/clinical:hl7-resource-consent';
 import { insertConsent, removeConsentById, updateConsent } from 'meteor/clinical:hl7-resource-consent';
 
 
@@ -12,7 +10,7 @@ import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
 import TextField from 'material-ui/TextField';
 
-import { Consents } from '../../lib/Consents';
+import { Consents } from '../lib/Consents';
 import { Session } from 'meteor/session';
 
 

@@ -1,17 +1,13 @@
 import { CardText, CardTitle } from 'material-ui/Card';
 import { Tab, Tabs } from 'material-ui/Tabs';
-import { GlassCard, VerticalCanvas } from 'meteor/clinical:glass-ui';
+import { GlassCard, Glass, VerticalCanvas } from 'meteor/clinical:glass-ui';
 
-import Glass from './Glass';
-//import GlassCard from './GlassCard';
 import ConsentDetail from './ConsentDetail';
 import ConsentTable from './ConsentTable';
 import React from 'react';
 import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
-//import { VerticalCanvas } from './VerticalCanvas';
 
-// import { Consents } from '../lib/Consents';
 import { Session } from 'meteor/session';
 
 let defaultConsent = {
