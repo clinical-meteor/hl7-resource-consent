@@ -31,11 +31,15 @@ Package.onUse(function (api) {
 
   api.imply('clinical:user-model');
 
+  api.use('digilord:faker@1.0.7');
+  
   api.addFiles('lib/Consents.js');
 
   api.addFiles('server/methods.js', 'server');
   api.addFiles('server/rest.js', 'server');
   api.addFiles('server/hooks.consents.js', 'server');
+
+  api.addAssets('data/consent-example-smartonfhir.json', ['client', 'server']);
 
   if(Package['clinical:fhir-vault-server']){
     api.use('clinical:fhir-vault-server@0.0.3', ['client', 'server'], {weak: true});

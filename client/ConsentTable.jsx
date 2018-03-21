@@ -49,16 +49,28 @@ export class ConsentTable extends React.Component {
         _id: document._id,
         dateTime: moment(get(document, 'dateTime', null)).format("YYYY-MM-DD"),
         status: get(document, 'status', ''),
-        patientReference: get(document, 'patient.reference', '').split('/')[1].toUpperCase(),
-        consentingParty: get(document, 'consentingParty.0.reference', '').split('/')[1].toUpperCase(),
-        organization: get(document, 'organization.0.reference', '').split('/')[1].toUpperCase(),
+        patientReference: get(document, 'patient.display', ''),
+        consentingParty: get(document, 'consentingParty.0.display', ''),
+        organization: get(document, 'organization.0.display', ''),
         policyRule: get(document, 'policyRule', ''),
         exceptType: get(document, 'except.0.type', ''),
         exceptAction: get(document, 'except.0.action.0.coding.0.code', ''),
-        exceptClass: get(document, 'except.0.class.0.code', ''),
+        exceptClass: '',
         start: get(document, 'period.start', ''),
         end: get(document, 'period.end', '')
       };
+
+      var exceptions;
+      if(get(document, 'except.0.class')){
+        result.exceptClass = "";
+        document.except[0].class.forEach(function(exception){   
+          if(result.exceptClass == ''){
+            result.exceptClass = exception.code;
+          }  else {
+            result.exceptClass = result.exceptClass + ' - ' + exception.code;
+          }      
+        });
+      }
       return result;
     });
 
@@ -84,25 +96,35 @@ export class ConsentTable extends React.Component {
   }
   render () {
     let tableRows = [];
-    for (var i = 0; i < this.data.consents.length; i++) {
-      tableRows.push(
-        <tr key={i} className="consentRow" style={{cursor: "pointer"}}>
+    let footer;
 
-          <td className='date' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.consents[i].dateTime }</td>
-          <td className='status' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell}>{this.data.consents[i].status}</td>
-          <td className='patientReference' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell} >{this.data.consents[i].patientReference }</td>
-          <td className='consentingParty' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell} >{this.data.consents[i].consentingParty}</td>
-          <td className='organization' style={this.data.style.cell} >{this.data.consents[i].organization}</td>
-          <td className='policyRule' style={this.data.style.cell} >{this.data.consents[i].policyRule}</td>
-          <td className='exceptType' style={this.data.style.cell} >{this.data.consents[i].exceptType}</td>
-          <td className='exceptAction' style={this.data.style.cell} >{this.data.consents[i].exceptAction}</td>
-          <td className='exceptClass' style={this.data.style.cell} >{this.data.consents[i].exceptClass}</td>
-        </tr>
-      );
+    if(this.data.consents.length === 0){
+      footer = <div style={{width: '100%', paddingTop: '120px', textAlign: 'center'}} >
+        <h3>No data.</h3>
+        <span>Are you sure you're logged in?</span>
+      </div>
+    } else {
+      for (var i = 0; i < this.data.consents.length; i++) {
+        tableRows.push(
+          <tr key={i} className="consentRow" style={{cursor: "pointer"}}>
+  
+            <td className='date' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.consents[i].dateTime }</td>
+            <td className='status' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell}>{this.data.consents[i].status}</td>
+            <td className='patientReference' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell} >{this.data.consents[i].patientReference }</td>
+            <td className='consentingParty' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell} >{this.data.consents[i].consentingParty}</td>
+            <td className='organization' style={this.data.style.cell} >{this.data.consents[i].organization}</td>
+            {/* <td className='policyRule' style={this.data.style.cell} >{this.data.consents[i].policyRule}</td> */}
+            <td className='exceptType' style={this.data.style.cell} >{this.data.consents[i].exceptType}</td>
+            <td className='exceptAction' style={this.data.style.cell} >{this.data.consents[i].exceptAction}</td>
+            <td className='exceptClass' style={this.data.style.cell} >{this.data.consents[i].exceptClass}</td>
+          </tr>
+        );
+      }  
     }
 
     return(
-      <Table id='consentsTable' hover >
+      <div>
+        <Table id='consentsTable' hover >
         <thead>
           <tr>
             <th className='name' style={{minWidth: '100px'}}>date</th>
@@ -110,7 +132,7 @@ export class ConsentTable extends React.Component {
             <th className='patientReference'>patient</th>
             <th className='consentingParty' >consenting party</th>
             <th className='organization' >organization</th>
-            <th className='rule' >rule</th>
+            {/* <th className='rule' >rule</th> */}
             <th className='type' >type</th>
             <th className='action' >action</th>
             <th className='class' >class</th>
@@ -120,6 +142,8 @@ export class ConsentTable extends React.Component {
           { tableRows }
         </tbody>
       </Table>
+      { footer }
+      </div>
     );
   }
 }
