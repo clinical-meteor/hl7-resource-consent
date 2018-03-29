@@ -248,30 +248,40 @@ Meteor.methods({
           "RiskAssessment"
         ]
 
-        var numPatients = 50;
-        for (let index = 0; index < numPatients; index++) {  
+        if(Consents.find().count() < 2){
+          var numPatients = 50;
+          for (let index = 0; index < numPatients; index++) {  
 
-          newConsent.patient = Random.choice(patients)
-
-          newConsent.organization = [];
-          newConsent.organization.push(Random.choice(organizations))
-
-          var randomInt = Random.cardinal(5);
-          newException.class = [];
-          for (let j = 0; j < randomInt; j++) {            
-            newException.class.push({
-              system: "http://hl7.org/fhir/resource-types",
-              code: Random.choice(resourceTypes)
-            });
-          }
-          newConsent.except.push(newException);
-
-          newConsent.consentingParty = [ newConsent.patient ]
-          newConsent.category.push(Random.choice(consentCategories));
-
-          var consentId = Consents.insert(newConsent);
-          console.log('Initialized ' + consentId)          
+            if (index % 10 === 0){
+              newConsent.patient = {
+                "reference": "Patient/01-544382",
+                "display": "Jane Doe"
+              }
+            } else {
+              newConsent.patient = Random.choice(patients)
+            }
+  
+            newConsent.dateTime = new Date(Random.date('2000-01-01'));
+            newConsent.organization = [];
+            newConsent.organization.push(Random.choice(organizations))
+  
+            var randomInt = Random.cardinal(5);
+            newException.class = [];
+            for (let j = 0; j < randomInt; j++) {            
+              newException.class.push({
+                system: "http://hl7.org/fhir/resource-types",
+                code: Random.choice(resourceTypes)
+              });
+            }
+            newConsent.except.push(newException);
+  
+            newConsent.consentingParty = [ newConsent.patient ]
+            newConsent.category.push(Random.choice(consentCategories));
+  
+            var consentId = Consents.insert(newConsent);
+            //console.log('Initialized ' + consentId)          
+          }  
+          console.log('Initialized ' + Consents.find().count() + ' records.')          
         }
-
     }
 })

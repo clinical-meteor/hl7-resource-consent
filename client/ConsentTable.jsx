@@ -9,7 +9,7 @@ import { Table } from 'react-bootstrap';
 //import { Consents } from '../../lib/Consents';
 import { Session } from 'meteor/session';
 import { has, get } from 'lodash';
-
+import { TableNoData } from 'meteor/clinical:glass-ui';
 
 export class ConsentTable extends React.Component {
   getMeteorData() {
@@ -33,11 +33,16 @@ export class ConsentTable extends React.Component {
     };
 
     let query = {};
+    if(this.props.patient){
+      query['patient.display'] = this.props.patient;
+    }
+
     let options = {};
     // number of items in the table should be set globally
     if (get(Meteor, 'settings.public.defaults.paginationLimit')) {
       options.limit = get(Meteor, 'settings.public.defaults.paginationLimit');
     }
+
     // but can be over-ridden by props being more explicit
     if(this.props.limit){
       options.limit = this.props.limit;      
@@ -99,10 +104,12 @@ export class ConsentTable extends React.Component {
     let footer;
 
     if(this.data.consents.length === 0){
-      footer = <div style={{width: '100%', paddingTop: '120px', textAlign: 'center'}} >
-        <h3>No data.</h3>
-        <span>Are you sure you're logged in?</span>
-      </div>
+      // don't try to simplifiy the double negative in this expression
+      // it's handling a boolean property, and also serving up instructions/help/warning
+      // it's klunky to reason through; but it's not hurting anything
+      if(!(this.props.noDataMessage === false)){
+        footer = <TableNoData />
+      }
     } else {
       for (var i = 0; i < this.data.consents.length; i++) {
         tableRows.push(
