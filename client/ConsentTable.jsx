@@ -1,12 +1,9 @@
-import Avatar from 'material-ui/Avatar';
-import FlatButton from 'material-ui/FlatButton';
+import { FlatButton, RaisedButton, Avatar } from 'material-ui';
 import { HTTP } from 'meteor/http';
 import React from 'react';
 import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
 import { Table } from 'react-bootstrap';
-
-//import { Consents } from '../../lib/Consents';
 import { Session } from 'meteor/session';
 import { has, get } from 'lodash';
 import { TableNoData } from 'meteor/clinical:glass-ui';
@@ -99,6 +96,9 @@ export class ConsentTable extends React.Component {
     Session.set('selectedConsent', id);
     Session.set('consentPageTabIndex', 2);
   }
+  handleRevoke(id){
+    console.log('handleRevoke')
+  }
   render () {
     let tableRows = [];
     let footer;
@@ -122,8 +122,11 @@ export class ConsentTable extends React.Component {
             <td className='organization' style={this.data.style.cell} >{this.data.consents[i].organization}</td>
             {/* <td className='policyRule' style={this.data.style.cell} >{this.data.consents[i].policyRule}</td> */}
             <td className='exceptType' style={this.data.style.cell} >{this.data.consents[i].exceptType}</td>
-            <td className='exceptAction' style={this.data.style.cell} >{this.data.consents[i].exceptAction}</td>
+            {/* <td className='exceptAction' style={this.data.style.cell} >{this.data.consents[i].exceptAction}</td> */}
             <td className='exceptClass' style={this.data.style.cell} >{this.data.consents[i].exceptClass}</td>
+            <td className='revoke'>
+              <FlatButton label="Revoke" onClick={this.handleRevoke.bind(this)} />
+            </td>
           </tr>
         );
       }  
@@ -141,8 +144,9 @@ export class ConsentTable extends React.Component {
             <th className='organization' >organization</th>
             {/* <th className='rule' >rule</th> */}
             <th className='type' >type</th>
-            <th className='action' >action</th>
+            {/* <th className='action' >action</th> */}
             <th className='class' >class</th>
+            <th className='revoke' >revoke</th>
           </tr>
         </thead>
         <tbody>
