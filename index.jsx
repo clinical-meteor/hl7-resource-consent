@@ -21,7 +21,14 @@ var SidebarElements = [{
   'href': '/consents'
 }];
 
+var AdminSidebarElements = [{
+  'primaryText': 'Consents',
+  'to': '/consents',
+  'href': '/consents'
+}];
+
 export { 
+  AdminSidebarElements,
   SidebarElements, 
   DynamicRoutes, 
 
