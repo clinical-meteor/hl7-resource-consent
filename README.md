@@ -1,15 +1,21 @@
 ##  clinical:hl7-resource-consent   
 
-HL7 FHIR Resource - Consent
+#### Licensing  
+
+![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 
---------------------------------------------  
-#### Schema Version 
+#### Integration & Verification Tests  
+
+[![CircleCI](https://circleci.com/gh/clinical-meteor/hl7-resource-consent/tree/master.svg?style=svg)](https://circleci.com/gh/clinical-meteor/hl7-resource-consent/tree/master)
+
+
+#### API Reference  
 
 The resource in this package implements the `FHIR 1.6.0 - STU3 Ballot` version of the Consent resource schema, specified at  [http://hl7.org/fhir/2016Sep/consent.html](http://hl7.org/fhir/2016Sep/consent.html).  
 
 
---------------------------------------------  
+
 #### Installation  
 
 ```bash
@@ -23,7 +29,7 @@ meteor add clinical:autopublish
 ```
 
 
---------------------------------------------  
+ 
 #### Example    
 
 ```js
@@ -33,7 +39,7 @@ var newConsent = {
 Consents.insert(newConsent);
 ```
 
---------------------------------------------  
+
 #### Extending the Schema  
 
 If you have extra fields that you would like to attach to the schema, extend the schema like so:  
@@ -51,7 +57,7 @@ ExtendedConsentSchema = new SimpleSchema([
 Consents.attachSchema( ExtendedConsentSchema );
 ```
 
---------------------------------------------  
+
 #### Initialize a Sample Consent  
 
 Call the `initializeConsent` method to create a sample consent in the Consents collection.
@@ -61,12 +67,14 @@ Meteor.startup(function(){
   Meteor.call('initializeConsent');
 })
 ```
---------------------------------------------  
+
+
 #### Server Methods  
 
 This package supports `createConsent`, `initializeConsent`, and `dropConsent` methods.
 
---------------------------------------------  
+
+
 #### REST API Points    
 
 This package supports the following REST API endpoints.  All endpoints require an OAuth token.  
@@ -87,7 +95,7 @@ If you would like to test the REST API without the OAuth infrastructure, launch 
 NOAUTH=true meteor
 ```
 
---------------------------------------------  
+
 #### Conformance Statement  
 
 This package conforms to version `FHIR 1.6.0 - STU3 Ballot`, as per the Touchstone testing utility.  
@@ -95,7 +103,6 @@ This package conforms to version `FHIR 1.6.0 - STU3 Ballot`, as per the Touchsto
 ![https://raw.githubusercontent.com/clinical-meteor/hl7-resource-consent/master/screenshots/Screen%20Shot%202017-03-18%20at%2010.56.09%20PM.png](https://raw.githubusercontent.com/clinical-meteor/hl7-resource-consent/master/screenshots/Screen%20Shot%202017-03-18%20at%2010.56.09%20PM.png)  
 
 
---------------------------------------------  
-#### Licensing   
+#### Acknowledgements     
 
-![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)
+Many thanks to UPenn Medical and the FhirBlocks Project for their generous support in sponsoring this package.   
