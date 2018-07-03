@@ -1,6 +1,6 @@
 Package.describe({
   name: 'clinical:hl7-resource-consent',
-  version: '3.3.6',
+  version: '3.3.7',
   summary: 'HL7 FHIR Resource - Consent',
   git: 'https://github.com/clinical-meteor/hl7-resource-consent',
   documentation: 'README.md'
@@ -28,7 +28,8 @@ Package.onUse(function (api) {
   api.use('clinical:hl7-resource-bundle@1.3.10');
   api.use('clinical:hl7-resource-patient@3.2.11');
   api.use('matb33:collection-hooks@0.7.15');
-
+  api.use('clinical:alert@2.1.3');
+  
   api.imply('clinical:user-model');
 
   api.use('digilord:faker@1.0.7');
