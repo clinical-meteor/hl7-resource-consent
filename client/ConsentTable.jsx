@@ -7,6 +7,7 @@ import { Table } from 'react-bootstrap';
 import { Session } from 'meteor/session';
 import { has, get } from 'lodash';
 import { TableNoData } from 'meteor/clinical:glass-ui';
+import Checkbox from 'material-ui/Checkbox';
 
 export class ConsentTable extends React.Component {
   getMeteorData() {
@@ -59,7 +60,8 @@ export class ConsentTable extends React.Component {
         exceptAction: get(document, 'except.0.action.0.coding.0.code', ''),
         exceptClass: '',
         start: get(document, 'period.start', ''),
-        end: get(document, 'period.end', '')
+        end: get(document, 'period.end', ''),
+        category: get(document, 'category.0.coding.0.code', '')
       };
 
       var exceptions;
@@ -114,16 +116,19 @@ export class ConsentTable extends React.Component {
       for (var i = 0; i < this.data.consents.length; i++) {
         tableRows.push(
           <tr key={i} className="consentRow" style={{cursor: "pointer"}}>
+            <td className='selected'  style={{minWidth: '100px', paddingTop: '16px'}}><Checkbox /></td>
+            <td className='identifier barcode' style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.consents[i]._id }</td>
   
             <td className='date' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.consents[i].dateTime }</td>
             <td className='status' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell}>{this.data.consents[i].status}</td>
             <td className='patientReference' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell} >{this.data.consents[i].patientReference }</td>
-            <td className='consentingParty' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell} >{this.data.consents[i].consentingParty}</td>
+            {/* <td className='consentingParty' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell} >{this.data.consents[i].consentingParty}</td> */}
             <td className='organization' style={this.data.style.cell} >{this.data.consents[i].organization}</td>
             {/* <td className='policyRule' style={this.data.style.cell} >{this.data.consents[i].policyRule}</td> */}
             <td className='exceptType' style={this.data.style.cell} >{this.data.consents[i].exceptType}</td>
             {/* <td className='exceptAction' style={this.data.style.cell} >{this.data.consents[i].exceptAction}</td> */}
             <td className='exceptClass' style={this.data.style.cell} >{this.data.consents[i].exceptClass}</td>
+            <td className='category' style={this.data.style.cell} >{this.data.consents[i].category}</td>
             <td className='revoke'>
               <FlatButton label="Revoke" onClick={this.handleRevoke.bind(this)} />
             </td>
@@ -137,15 +142,18 @@ export class ConsentTable extends React.Component {
         <Table id='consentsTable' hover >
         <thead>
           <tr>
+            <th className='selected'>selected</th>
+            <th className='identifier'>identifier</th>
             <th className='name' style={{minWidth: '100px'}}>date</th>
             <th className='status'>status</th>
             <th className='patientReference'>patient</th>
-            <th className='consentingParty' >consenting party</th>
+            {/* <th className='consentingParty' >consenting party</th> */}
             <th className='organization' >organization</th>
             {/* <th className='rule' >rule</th> */}
             <th className='type' >type</th>
             {/* <th className='action' >action</th> */}
             <th className='class' >class</th>
+            <th className='category' >category</th>
             <th className='revoke' >revoke</th>
           </tr>
         </thead>

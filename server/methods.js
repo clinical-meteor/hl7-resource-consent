@@ -1,7 +1,7 @@
 var consentCategories = [{
   system: "http://hl7.org/fhir/consentcategorycodes	",
   code: "42-CFR-2",
-  display: "42 CFR Part 2 Form of written consent"
+  display: "42 CFR Part 2 Form of Written Consent"
 }, {
   system: "http://hl7.org/fhir/consentcategorycodes	",
   code: "ACD",
@@ -195,7 +195,6 @@ Meteor.methods({
 
         newConsent.except.push(newException)
 
-
         var patients = [];
         var numberPatients = 50;
         for (let index = 0; index < numberPatients; index++) {
@@ -264,7 +263,13 @@ Meteor.methods({
             newConsent.dateTime = new Date(Random.date('2000-01-01'));
             newConsent.organization = [];
             newConsent.organization.push(Random.choice(organizations))
-  
+
+
+            newConsent.status = Random.choice(['draft', 'proposed', 'active', 'rejected', 'inactive' , 'entered-in-error'])
+            newConsent.category = [];
+            newConsent.category.push({coding: [Random.choice(consentCategories)]});
+    
+
             var randomInt = Random.cardinal(5);
             newException.class = [];
             for (let j = 0; j < randomInt; j++) {            
@@ -276,7 +281,6 @@ Meteor.methods({
             newConsent.except.push(newException);
   
             newConsent.consentingParty = [ newConsent.patient ]
-            newConsent.category.push(Random.choice(consentCategories));
   
             var consentId = Consents.insert(newConsent);
             //console.log('Initialized ' + consentId)          

@@ -1,17 +1,15 @@
-import { CardActions, CardText } from 'material-ui/Card';
-import { get, has, set } from 'lodash';
-import { insertConsent, removeConsentById, updateConsent } from 'meteor/clinical:hl7-resource-consent';
-
+import { get } from 'lodash';
 
 import { Bert } from 'meteor/clinical:alert';
-import RaisedButton from 'material-ui/RaisedButton';
+import { CardActions, CardText, Checkbox, RaisedButton, SelectField, MenuItem, TextField } from 'material-ui';
 import React from 'react';
 import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
-import TextField from 'material-ui/TextField';
 
 import { Consents } from '../lib/Consents';
 import { Session } from 'meteor/session';
+
+import { Col, Row, Table } from 'react-bootstrap';
 
 
 let defaultConsent = {
@@ -44,10 +42,12 @@ let defaultConsent = {
 
 Session.setDefault('consentUpsert', false);
 Session.setDefault('selectedConsent', false);
+Session.setDefault('selectedCategory', 0);
 
 export default class ConsentDetail extends React.Component {
   getMeteorData() {
     let data = {
+      selectedCategory: Session.get('selectedCategory'),
       consentId: false,
       consent: defaultConsent
     };
@@ -77,62 +77,176 @@ export default class ConsentDetail extends React.Component {
     if(process.env.NODE_ENV === "test") console.log("ConsentDetail[data]", data);
     return data;
   }
-
+  changeSelectedCategory(event, value){
+    console.log('changeSelectedCategory', event, value)
+    Session.set('selectedCategory', value)
+  }
   render() {
+
+    let renderText;
+
+    switch (this.data.selectedCategory) {
+      case 0:
+        renderText = <Table>
+          <thead>
+            <tr>
+              <th className='selected'>selected</th>
+              <th className='category' >category</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="consentRow" style={{cursor: "pointer"}}>
+              <td className='selected'  style={{width: '20px', paddingTop: '16px'}}><Checkbox /></td>
+              <td className='category' style={{minWidth: '100px', paddingTop: '16px'}}>Allergies</td>          
+            </tr>
+            <tr className="consentRow" style={{cursor: "pointer"}}>
+              <td className='selected'  style={{width: '20px', paddingTop: '16px'}}><Checkbox /></td>
+              <td className='category' style={{minWidth: '100px', paddingTop: '16px'}}>CarePlans</td>          
+            </tr>
+            <tr className="consentRow" style={{cursor: "pointer"}}>
+              <td className='selected'  style={{width: '20px', paddingTop: '16px'}}><Checkbox /></td>
+              <td className='category' style={{minWidth: '100px', paddingTop: '16px'}}>Conditions</td>          
+            </tr>
+            <tr className="consentRow" style={{cursor: "pointer"}}>
+              <td className='selected'  style={{width: '20px', paddingTop: '16px'}}><Checkbox /></td>
+              <td className='category' style={{minWidth: '100px', paddingTop: '16px'}}>Devices</td>          
+            </tr>
+            <tr className="consentRow" style={{cursor: "pointer"}}>
+              <td className='selected'  style={{width: '20px', paddingTop: '16px'}}><Checkbox /></td>
+              <td className='category' style={{minWidth: '100px', paddingTop: '16px'}}>Family Member Histories</td>          
+            </tr>
+            <tr className="consentRow" style={{cursor: "pointer"}}>
+              <td className='selected'  style={{width: '20px', paddingTop: '16px'}}><Checkbox /></td>
+              <td className='category' style={{minWidth: '100px', paddingTop: '16px'}}>Goals</td>          
+            </tr>
+            <tr className="consentRow" style={{cursor: "pointer"}}>
+              <td className='selected'  style={{width: '20px', paddingTop: '16px'}}><Checkbox /></td>
+              <td className='category' style={{minWidth: '100px', paddingTop: '16px'}}>Immunizations</td>          
+            </tr>
+            <tr className="consentRow" style={{cursor: "pointer"}}>
+              <td className='selected'  style={{width: '20px', paddingTop: '16px'}}><Checkbox /></td>
+              <td className='category' style={{minWidth: '100px', paddingTop: '16px'}}>Medication Statements</td>          
+            </tr>
+            <tr className="consentRow" style={{cursor: "pointer"}}>
+              <td className='selected'  style={{width: '20px', paddingTop: '16px'}}><Checkbox /></td>
+              <td className='category' style={{minWidth: '100px', paddingTop: '16px'}}>Observations</td>          
+            </tr>
+            <tr className="consentRow" style={{cursor: "pointer"}}>
+              <td className='selected'  style={{width: '20px', paddingTop: '16px'}}><Checkbox /></td>
+              <td className='category' style={{minWidth: '100px', paddingTop: '16px'}}>Patient Demographics</td>          
+            </tr>
+            <tr className="consentRow" style={{cursor: "pointer"}}>
+              <td className='selected'  style={{width: '20px', paddingTop: '16px'}}><Checkbox /></td>
+              <td className='category' style={{minWidth: '100px', paddingTop: '16px'}}>Procedures</td>          
+            </tr>
+          </tbody>
+        </Table>
+      break;
+        case 4:
+          renderText = <div>
+              <p>I understand DNR means that if my heart stops beating or if I stop breathing, no medical procedure to restart breathing or heart functioning will be instituted.</p>
+              <p>I understand this decision will not prevent me from obtaining other emergency medical care by prehospital emergency medical care personnel and/or medical care directed by a physician prior to my death.</p>
+              <p>I understand I may revoke this directive at any time by destroying this form and removing any “DNR” medallions.</p>
+              <p>I give permission for this information to be given to the prehospital emergency care personnel, doctors, nurses or other health personnel as necessary to implement this directive.</p>
+              <p>I hereby agree to the “Do Not Resuscitate” (DNR) order.</p>
+            </div>
+        break;
+      default:
+        break;
+    }
+
+
     return (
       <div id={this.props.id} className="consentDetail">
         <CardText>
-          <TextField
-            id='nameInput'
-            ref='name'
-            name='name'
-            floatingLabelText='name'
-            value={ get(this, 'data.consent.name[0].text', '')}
-            onChange={ this.changeState.bind(this, 'name')}
-            fullWidth
-            /><br/>
-          <TextField
-            id='genderInput'
-            ref='gender'
-            name='gender'
-            floatingLabelText='gender'
-            hintText='male | female | other | indeterminate | unknown'
-            value={ get(this, 'data.consent.gender', '')}
-            onChange={ this.changeState.bind(this, 'gender')}
-            fullWidth
-            /><br/>
-          <TextField
-            id='birthdateInput'
-            ref='birthdate'
-            name='birthdate'
-            floatingLabelText='birthdate'
-            hintText='YYYY-MM-DD'
-            value={ get(this, 'data.consent.birthDate', '')}
-            onChange={ this.changeState.bind(this, 'birthDate')}
-            fullWidth
-            /><br/>
-          <TextField
-            id='photoInput'
-            ref='photo'
-            name='photo'
-            floatingLabelText='photo'
-            value={ get(this, 'data.consent.photo[0].url', '')}
-            onChange={ this.changeState.bind(this, 'photo')}
-            floatingLabelFixed={false}
-            fullWidth
-            /><br/>
-          <TextField
-            id='mrnInput'
-            ref='mrn'
-            name='mrn'
-            floatingLabelText='medical record number'
-            value={ get(this, 'data.consent.identifier[0].value', '')}
-            onChange={ this.changeState.bind(this, 'mrn')}
-            fullWidth
-            /><br/>
+          <Row>
+            <Col md={6}>
+              <TextField
+                id='identifierInput'
+                ref='identifier'
+                name='identifier'
+                className='barcode'
+                floatingLabelText='Identifier'
+                hintText={Random.id()}
+                value={ get(this, 'data.consent.identifier[0].value', '')}
+                onChange={ this.changeState.bind(this, 'mrn')}
+                floatingLabelFixed={true}
+                fullWidth
+                /><br/>
+              <TextField
+                id='patientNameInput'
+                ref='patientName'
+                name='patientName'
+                floatingLabelText='Patient Name'
+                hintText='Jane Doe'
+                // value={ get(this, 'data.consent.name[0].text', '')}
+                // onChange={ this.changeState.bind(this, 'name')}
+                floatingLabelFixed={true}
+                fullWidth
+                /><br/>
+              <TextField
+                id='organizationInput'
+                ref='organization'
+                name='organization'
+                floatingLabelText='Organization'
+                hintText='St. James Infirmiry'
+                // value={ get(this, 'data.consent.name[0].text', '')}
+                // onChange={ this.changeState.bind(this, 'name')}
+                floatingLabelFixed={true}
+                fullWidth
+                /><br/>
+              <TextField
+                id='statusInput'
+                ref='status'
+                name='status'
+                floatingLabelText='status'
+                hintText='draft | proposed | active | rejected | inactive | entered-in-error'
+                // value={ get(this, 'data.consent.gender', '')}
+                // onChange={ this.changeState.bind(this, 'gender')}
+                floatingLabelFixed={true}
+                fullWidth
+                /><br/>
+              <TextField
+                id='signedOnInput'
+                ref='signedOn'
+                name='signedOn'
+                type='date'
+                floatingLabelText='Signed On'
+                // hintText='YYYY-MM-DD'
+                // value={ get(this, 'data.consent.birthDate', '')}
+                // onChange={ this.changeState.bind(this, 'birthDate')}
+                floatingLabelFixed={true}
+                fullWidth
+                /><br/><br/>
+
+              { this.determineButtons(this.data.consentId) }
+            </Col>
+            <Col md={6}>
+              <SelectField
+                floatingLabelText="Category"
+                value={0}
+                onChange={this.changeSelectedCategory.bind(this)}
+                fullWidth={true}
+              >
+                <MenuItem value={0} primaryText="OAuth 2.0" />
+                <MenuItem value={1} primaryText="Illinois Consent by Minors to Medical Procedures" />
+                <MenuItem value={2} primaryText="42 CFR Part 2 Form of Written Consent" />
+                <MenuItem value={3} primaryText="Common rule informed consent" />
+                <MenuItem value={4} primaryText="Do Not Resuscitate" />
+                <MenuItem value={5} primaryText="HIPAA Authorization" />
+                <MenuItem value={6} primaryText="HIPAA Notice of Privacy Practices" />
+                <MenuItem value={7} primaryText="HIPAA Restrictions" />
+                <MenuItem value={8} primaryText="HIPAA Research Authorization" />
+                <MenuItem value={9} primaryText="HIPAA Self-Pay Restriction" />
+                <MenuItem value={10} primaryText="Research Information Access" />
+                <MenuItem value={11} primaryText="Authorization to Disclose Information to the Social Security Administration" />
+                <MenuItem value={12} primaryText="Authorization and Consent to Release Information to the Department of Veterans Affairs (VA)" />
+              </SelectField>
+              { renderText }
+            </Col>
+          </Row>
         </CardText>
         <CardActions>
-          { this.determineButtons(this.data.consentId) }
         </CardActions>
       </div>
     );
