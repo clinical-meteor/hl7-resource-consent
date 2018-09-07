@@ -23,6 +23,8 @@ let defaultConsent = {
 Session.setDefault('consentFormData', defaultConsent);
 Session.setDefault('consentSearchFilter', '');
 Session.setDefault('consentDialogOpen', false);
+Session.setDefault('selectedConsentId', false);
+Session.setDefault('fhirVersion', 'v1.0.2');
 
 export class ConsentsPage extends React.Component {
   getMeteorData() {
@@ -38,7 +40,9 @@ export class ConsentsPage extends React.Component {
       consent: defaultConsent,
       consentSearchFilter: '',
       currentConsent: null,
-      dialogOpen: Session.get('consentDialogOpen')
+      dialogOpen: Session.get('consentDialogOpen'), 
+      selectedConsentId: Session.get('selectedConsentId'),
+      selectedConsent: false,
     };
 
     if (Session.get('consentFormData')) {
@@ -49,6 +53,12 @@ export class ConsentsPage extends React.Component {
     }
     if (Session.get("selectedConsent")) {
       data.currentConsent = Session.get("selectedConsent");
+    }
+
+    if (Session.get('selectedConsentId')){
+      data.selectedConsentId = Consents.findOne({_id: Session.get('selectedConsentId')});
+    } else {
+      data.selectedConsentId = false;
     }
 
     data.style = Glass.blur(data.style);
@@ -99,13 +109,25 @@ export class ConsentsPage extends React.Component {
             <CardText>
               <Tabs id='consentsPageTabs' default value={this.data.tabIndex} onChange={this.handleTabChange} initialSelectedIndex={1}>
                  <Tab className="newConsentTab" label='New' style={this.data.style.tab} onActive={ this.onNewTab } value={0}>
-                   <ConsentDetail id='newConsent' />
+                   <ConsentDetail 
+                   id='newConsent' 
+                   fhirVersion={ this.data.fhirVersion }
+                   consent={ this.data.selectedConsent }
+                   consentId={ this.data.selectedConsentId } />       
                  </Tab>
                  <Tab className="consentListTab" label='Consents' onActive={this.handleActive} style={this.data.style.tab} value={1}>
-                   <ConsentTable showBarcodes={true} />
+                   <ConsentTable 
+                    showBarcodes={true} 
+                    noDataMessagePadding={100}
+                    />
                  </Tab>
                  <Tab className="consentDetailTab" label='Detail' onActive={this.handleActive} style={this.data.style.tab} value={2}>
-                   <ConsentDetail id='consentDetails' currentConsent={this.data.currentConsent} />
+                   <ConsentDetail 
+                    id='consentDetails' 
+                    fhirVersion={ this.data.fhirVersion }
+                    consent={ this.data.selectedConsent }
+                    consentId={ this.data.selectedConsentId } />                     
+                    />
                  </Tab>
              </Tabs>
 

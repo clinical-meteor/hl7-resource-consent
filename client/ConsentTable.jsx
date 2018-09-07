@@ -53,15 +53,15 @@ export class ConsentTable extends React.Component {
         dateTime: moment(get(document, 'dateTime', null)).format("YYYY-MM-DD"),
         status: get(document, 'status', ''),
         patientReference: get(document, 'patient.display', ''),
-        consentingParty: get(document, 'consentingParty.0.display', ''),
-        organization: get(document, 'organization.0.display', ''),
+        consentingParty: get(document, 'consentingParty[0].display', ''),
+        organization: get(document, 'organization.display', ''),
         policyRule: get(document, 'policyRule', ''),
-        exceptType: get(document, 'except.0.type', ''),
-        exceptAction: get(document, 'except.0.action.0.coding.0.code', ''),
-        exceptClass: '',
+        exceptType: get(document, 'except[0].type', ''),
+        exceptAction: get(document, 'except[0].action[0].text', ''),
+        exceptClass: get(document, 'except[0].class', ''),
         start: get(document, 'period.start', ''),
         end: get(document, 'period.end', ''),
-        category: get(document, 'category.0.coding.0.code', '')
+        category: get(document, 'category[0].text', '')
       };
 
       var exceptions;
@@ -110,7 +110,7 @@ export class ConsentTable extends React.Component {
       // it's handling a boolean property, and also serving up instructions/help/warning
       // it's klunky to reason through; but it's not hurting anything
       if(!(this.props.noDataMessage === false)){
-        footer = <TableNoData />
+        footer = <TableNoData noDataPadding={ this.props.noDataMessagePadding } />
       }
     } else {
       for (var i = 0; i < this.data.consents.length; i++) {
