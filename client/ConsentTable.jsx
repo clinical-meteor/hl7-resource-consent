@@ -142,19 +142,19 @@ export class ConsentTable extends React.Component {
         <Table id='consentsTable' hover >
         <thead>
           <tr>
-            <th className='selected'>selected</th>
-            <th className='identifier'>identifier</th>
-            <th className='name' style={{minWidth: '100px'}}>date</th>
-            <th className='status'>status</th>
-            <th className='patientReference'>patient</th>
+            <th className='selected'>Selected</th>
+            <th className='identifier'>Identifier</th>
+            <th className='name' style={{minWidth: '100px'}}>Date</th>
+            <th className='status'>Status</th>
+            <th className='patientReference'>Patient</th>
             {/* <th className='consentingParty' >consenting party</th> */}
-            <th className='organization' >organization</th>
+            <th className='organization' >Organization</th>
             {/* <th className='rule' >rule</th> */}
-            <th className='type' >type</th>
+            <th className='type' >Type</th>
             {/* <th className='action' >action</th> */}
-            <th className='class' >class</th>
-            <th className='category' >category</th>
-            <th className='revoke' >revoke</th>
+            <th className='class' >Class</th>
+            <th className='category' >Category</th>
+            <th className='revoke' >Revoke</th>
           </tr>
         </thead>
         <tbody>

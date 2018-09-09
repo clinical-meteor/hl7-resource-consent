@@ -31,7 +31,7 @@ export class ConsentDetail extends React.Component {
           },
           value: ""
         }],
-        status: '',
+        status: 'active',
         category: {
           coding: [
             {
@@ -147,7 +147,7 @@ export class ConsentDetail extends React.Component {
 
     switch (this.state.selectedConsentCategory) {
       case 0:
-        renderText = <div>
+        renderText = <div style={{textAlign: 'justify'}}>
           <b>Authorization</b>
           <p>I expressly authorize Duke University, Duke University Health System, Inc., the Private Diagnostic Clinic, PLLC and other members of the Duke Health Enterprise identified in its Notice of Privacy Practices (collectively “DHE”), any DHE member affiliates and subsidiaries, third party service providers, and any and all members faculty or medical staff members, employees, trainees, and students of any of the above (collectively “Duke”) to communicate with me by the methods checked below:</p>
           <b>Text Messages</b>
@@ -217,7 +217,7 @@ export class ConsentDetail extends React.Component {
         </Table>
         break;
       case 2:
-          renderText = <div>
+          renderText = <div >
               <p>I understand DNR means that if my heart stops beating or if I stop breathing, no medical procedure to restart breathing or heart functioning will be instituted.</p>
               <p>I understand this decision will not prevent me from obtaining other emergency medical care by prehospital emergency medical care personnel and/or medical care directed by a physician prior to my death.</p>
               <p>I understand I may revoke this directive at any time by destroying this form and removing any “DNR” medallions.</p>
@@ -235,6 +235,31 @@ export class ConsentDetail extends React.Component {
       <div id={this.props.id} className="consentDetail">
         <CardText>
           <Row>
+          <Col md={6}>
+              <SelectField
+                floatingLabelText="Category"
+                value={0}
+                onChange={this.changeSelectedCategory.bind(this)}
+                fullWidth={true}
+              >
+              
+                <MenuItem value={0} primaryText="Patient Authorization for Text Communications" />
+                <MenuItem value={1} primaryText="OAuth 2.0" />
+                <MenuItem value={2} primaryText="Do Not Resuscitate" />
+                <MenuItem value={3} disabled primaryText="Illinois Consent by Minors to Medical Procedures" />
+                <MenuItem value={4} disabled primaryText="42 CFR Part 2 Form of Written Consent" />
+                <MenuItem value={5} disabled primaryText="HIPAA Authorization" />
+                <MenuItem value={6} disabled primaryText="HIPAA Notice of Privacy Practices" />
+                <MenuItem value={7} disabled primaryText="HIPAA Restrictions" />
+                <MenuItem value={8} disabled primaryText="HIPAA Research Authorization" />
+                <MenuItem value={9} disabled primaryText="HIPAA Self-Pay Restriction" />
+                <MenuItem value={10} disabled primaryText="Research Information Access" />
+                <MenuItem value={11} disabled primaryText="Authorization to Disclose Information to the Social Security Administration" />
+                <MenuItem value={12} disabled primaryText="Authorization and Consent to Release Information to the Department of Veterans Affairs (VA)" />
+                <MenuItem value={13} disabled primaryText="Common rule informed consent" />
+              </SelectField>
+              { renderText }
+            </Col>
             <Col md={6}>
               <TextField
                 id='identifierInput'
@@ -281,7 +306,7 @@ export class ConsentDetail extends React.Component {
                 floatingLabelFixed={true}
                 fullWidth
                 /><br/>
-              <TextField
+              {/* <TextField
                 id='statusInput'
                 ref='status'
                 name='status'
@@ -291,7 +316,7 @@ export class ConsentDetail extends React.Component {
                 onChange={ this.changeState.bind(this, 'status')}
                 floatingLabelFixed={true}
                 fullWidth
-                /><br/>
+                /><br/> */}
               <TextField
                 id='dateTimeInput'
                 ref='dateTime'
@@ -305,31 +330,6 @@ export class ConsentDetail extends React.Component {
                 /><br/><br/>
 
               { this.determineButtons(this.data.consentId) }
-            </Col>
-            <Col md={6}>
-              <SelectField
-                floatingLabelText="Category"
-                value={0}
-                onChange={this.changeSelectedCategory.bind(this)}
-                fullWidth={true}
-              >
-              
-                <MenuItem value={0} primaryText="Patient Authorization for Text Communications" />
-                <MenuItem value={1} primaryText="OAuth 2.0" />
-                <MenuItem value={2} primaryText="Do Not Resuscitate" />
-                <MenuItem value={3} disabled primaryText="Illinois Consent by Minors to Medical Procedures" />
-                <MenuItem value={4} disabled primaryText="42 CFR Part 2 Form of Written Consent" />
-                <MenuItem value={5} disabled primaryText="HIPAA Authorization" />
-                <MenuItem value={6} disabled primaryText="HIPAA Notice of Privacy Practices" />
-                <MenuItem value={7} disabled primaryText="HIPAA Restrictions" />
-                <MenuItem value={8} disabled primaryText="HIPAA Research Authorization" />
-                <MenuItem value={9} disabled primaryText="HIPAA Self-Pay Restriction" />
-                <MenuItem value={10} disabled primaryText="Research Information Access" />
-                <MenuItem value={11} disabled primaryText="Authorization to Disclose Information to the Social Security Administration" />
-                <MenuItem value={12} disabled primaryText="Authorization and Consent to Release Information to the Department of Veterans Affairs (VA)" />
-                <MenuItem value={13} disabled primaryText="Common rule informed consent" />
-              </SelectField>
-              { renderText }
             </Col>
           </Row>
         </CardText>
@@ -478,7 +478,7 @@ export class ConsentDetail extends React.Component {
       fhirConsentData.resourceType = 'Consent';
 
       Consents.update({_id: this.state.consentId}, {$set: fhirConsentData }, {
-        validate: false, 
+        validate: true, 
         filter: false, 
         removeEmptyStrings: false
       }, function(error, result){
@@ -497,7 +497,7 @@ export class ConsentDetail extends React.Component {
       if(process.env.NODE_ENV === "test") console.log("Creating a new consent...", fhirConsentData);
 
       Consents.insert(fhirConsentData, {
-        validate: false, 
+        validate: true, 
         filter: false, 
         removeEmptyStrings: false
       }, function(error, result) {

@@ -1,3 +1,5 @@
+import { get } from 'lodash';
+
 var consentCategories = [{
   system: "http://hl7.org/fhir/consentcategorycodes	",
   code: "42-CFR-2",
@@ -195,31 +197,58 @@ Meteor.methods({
 
         newConsent.except.push(newException)
 
-        var patients = [];
-        var numberPatients = 50;
-        for (let index = 0; index < numberPatients; index++) {
+        let masterPatientArray = [];
+        var patients = [];        
+
+        if(Package['clinical:hl7-resource-patient']){
+          // if we can, we want to pull patient from our actual Patients colleciton
+          masterPatientArray = Patients.find({}, {limit: 50}).fetch();
+          if(masterPatientArray.length > 0){
+            masterPatientArray.forEach(function(actualPatient){
+              patients.push({
+                display: get(actualPatient, 'name[0].text', ''),
+                reference: "Patient/" + actualPatient._id
+              })    
+            })
+          }
+        } else {
+          // otherwise, we're going to use faker.js to create simulated patients
+          var numberPatients = 50;
+          for (let index = 0; index < numberPatients; index++) {
             patients.push({
               display: faker.name.findName(),
               reference: "Patient/" + Random._id
-          })              
+            })              
+          }
         }
+
+
 
         var organizations = [];
         var seedOrgs = [{
-          reference: "Organization/" + Random._id,
+          reference: "Organization/zksz4EhzJzTxuZsNJ",
           display: "All Saint's Hospital"
         }, {
-          reference: "Organization/" + Random._id,
+          reference: "Organization/cmfDFnAdCPeneuv8T",
           display: "St. James Infirmiry"
         }, {
-          reference: "Organization/" + Random._id,
+          reference: "Organization/TQuCu5HKGizXzchM7",
           display: "Rainbow's End Retirement Home"
         }, {
-          reference: "Organization/" + Random._id,
+          reference: "Organization/tyHFMwh45EYKgGbcz",
           display: "Blue Lagoon Geothermal Spa"
         }, {
-          reference: "Organization/" + Random._id,
+          reference: "Organization/6ASxrJ5cAj8uMN5Gr",
           display: "Hokkaido Noboribetsu Onsen"
+        }, {
+          reference: "Organization/F399zhEyyLuT45hxT",
+          display: "University of Pennsylvania Health System"
+        }, {
+          reference: "Organization/LYCzoixi8gqgeETks",
+          display: "Duke University"
+        }, {
+          reference: "Organization/rnFeJ8ptv6cbvzk7X",
+          display: "University of Chicago"
         }]
         
         organizations.push(seedOrgs[0])
@@ -281,11 +310,23 @@ Meteor.methods({
             newConsent.except.push(newException);
   
             newConsent.consentingParty = [ newConsent.patient ]
-  
-            var consentId = Consents.insert(newConsent);
+
+            let consentValidator = ConsentSchema.newContext();
+            consentValidator.validate(newConsent)
+        
+            console.log('IsValid: ', consentValidator.isValid())
+            console.log('ValidationErrors: ', consentValidator.validationErrors());
+
+
+            var consentId = Consents.insert(newConsent, function(error, result){
+              if(error) console.log('error', error)
+            });
             //console.log('Initialized ' + consentId)          
           }  
           console.log('Initialized ' + Consents.find().count() + ' records.')          
         }
+    },
+    dropConsents: function(){
+      Consents.drop({})
     }
 })
