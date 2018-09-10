@@ -1,4 +1,5 @@
 import { get } from 'lodash';
+import { faker } from 'faker';
 
 var consentCategories = [{
   system: "http://hl7.org/fhir/consentcategorycodes	",
@@ -179,7 +180,7 @@ Meteor.methods({
           reference: "Patient/01-567390",
           display: "Alice Doe"
         }
-        newConsent.organinzation = {
+        newConsent.orginization = {
           display: "St. James Infirmary"
         }
         newException.class = [{
@@ -317,8 +318,13 @@ Meteor.methods({
             console.log('IsValid: ', consentValidator.isValid())
             console.log('ValidationErrors: ', consentValidator.validationErrors());
 
+            console.log('newConsent', newConsent)
 
-            var consentId = Consents.insert(newConsent, function(error, result){
+            var consentId = Consents.insert(newConsent, {
+              validate: get(Meteor, 'settings.public.defaults.schemas.validate', false), 
+              filter: get(Meteor, 'settings.public.defaults.schemas.filter', false), 
+              removeEmptyStrings: get(Meteor, 'settings.public.defaults.schemas.removeEmptyStrings', false)
+             }, function(error, result){
               if(error) console.log('error', error)
             });
             //console.log('Initialized ' + consentId)          

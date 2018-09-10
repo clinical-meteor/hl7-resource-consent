@@ -42,7 +42,7 @@ export class ConsentsPage extends React.Component {
       currentConsent: null,
       dialogOpen: Session.get('consentDialogOpen'), 
       selectedConsentId: Session.get('selectedConsentId'),
-      selectedConsent: false,
+      selectedConsent: false
     };
 
     if (Session.get('consentFormData')) {
@@ -119,6 +119,7 @@ export class ConsentsPage extends React.Component {
                    <ConsentTable 
                     showBarcodes={true} 
                     noDataMessagePadding={100}
+                    patient={ this.data.consentSearchFilter }
                     />
                  </Tab>
                  <Tab className="consentDetailTab" label='Detail' onActive={this.handleActive} style={this.data.style.tab} value={2}>

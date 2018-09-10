@@ -478,9 +478,9 @@ export class ConsentDetail extends React.Component {
       fhirConsentData.resourceType = 'Consent';
 
       Consents.update({_id: this.state.consentId}, {$set: fhirConsentData }, {
-        validate: true, 
-        filter: false, 
-        removeEmptyStrings: false
+        validate: get(Meteor, 'settings.public.defaults.schemas.validate', false), 
+        filter: get(Meteor, 'settings.public.defaults.schemas.filter', false), 
+        removeEmptyStrings: get(Meteor, 'settings.public.defaults.schemas.removeEmptyStrings', false)
       }, function(error, result){
         if (error) {
           if(process.env.NODE_ENV === "test") console.log("Consents.insert[error]", error);
@@ -497,9 +497,9 @@ export class ConsentDetail extends React.Component {
       if(process.env.NODE_ENV === "test") console.log("Creating a new consent...", fhirConsentData);
 
       Consents.insert(fhirConsentData, {
-        validate: true, 
-        filter: false, 
-        removeEmptyStrings: false
+        validate: get(Meteor, 'settings.public.defaults.schemas.validate', false), 
+        filter: get(Meteor, 'settings.public.defaults.schemas.filter', false), 
+        removeEmptyStrings: get(Meteor, 'settings.public.defaults.schemas.removeEmptyStrings', false)
       }, function(error, result) {
         if (error) {
           if(process.env.NODE_ENV === "test")  console.log('Consents.insert[error]', error);
