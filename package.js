@@ -1,6 +1,6 @@
 Package.describe({
   name: 'clinical:hl7-resource-consent',
-  version: '3.4.7',
+  version: '3.4.8',
   summary: 'HL7 FHIR Resource - Consent',
   git: 'https://github.com/clinical-meteor/hl7-resource-consent',
   documentation: 'README.md'
@@ -16,7 +16,7 @@ Package.onUse(function (api) {
   api.use('aldeed:collection2@3.0.0');
   api.use('clinical:hl7-resource-datatypes@4.0.0');
   api.use('clinical:hl7-resource-bundle@1.4.0');
-  api.use('clinical:hl7-resource-patient@3.4.8');
+  api.use('clinical:hl7-resource-patient@3.4.9');
 
   api.use('simple:json-routes@2.1.0');
   api.use('momentjs:moment@2.17.1');
@@ -47,9 +47,6 @@ Package.onUse(function (api) {
   if(Package['clinical:fhir-vault-server']){
     api.use('clinical:fhir-vault-server@0.0.3', ['client', 'server'], {weak: true});
   }
-  // if(Package['clinical:desktop-publish']){
-  //   api.use('clinical:desktop-publish@2.2.1', ['client', 'server'], {weak: true});
-  // }
   
   api.export('Consent');
   api.export('Consents');
