@@ -6,7 +6,7 @@ import ConsentTable from './ConsentTable';
 import React from 'react';
 import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
-import { get } from 'lodash';
+import { get, set } from 'lodash';
 
 import { Session } from 'meteor/session';
 import { Col, Row, Table } from 'react-bootstrap';
@@ -22,11 +22,23 @@ let defaultConsent = {
 };
 Session.setDefault('consentFormData', defaultConsent);
 Session.setDefault('consentSearchFilter', '');
+Session.setDefault('consentSearchQuery', {});
 Session.setDefault('consentDialogOpen', false);
 Session.setDefault('selectedConsentId', false);
 Session.setDefault('fhirVersion', 'v1.0.2');
 
 export class ConsentsPage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      searchForm: {
+        givenName: '',
+        familyName: '',
+        category: 0
+      },
+      searchQuery: {}
+    }
+  }
   getMeteorData() {
     let data = {
       style: {
@@ -50,6 +62,9 @@ export class ConsentsPage extends React.Component {
     }
     if (Session.get('consentSearchFilter')) {
       data.consentSearchFilter = Session.get('consentSearchFilter');
+    }
+    if (Session.get('consentSearchQuery')) {
+      data.consentSearchQuery = Session.get('consentSearchQuery');
     }
     if (Session.get("selectedConsent")) {
       data.currentConsent = Session.get("selectedConsent");
@@ -80,7 +95,17 @@ export class ConsentsPage extends React.Component {
   handleClose(){
     Session.set('consentDialogOpen', false);
   }
+  handleSearch(){
+    console.log('handleSearch', get(this, 'state.searchForm'));
 
+    Session.set('consentSearchQuery', {
+      "$and": [
+        {"consentingParty.display": {"$regex": get(this, 'state.searchForm.familyName')}}, 
+        {"consentingParty.display": {"$regex": get(this, 'state.searchForm.givenName')}}
+      ]
+    });
+    this.handleClose();
+  }
   render() {
     console.log('React.version: ' + React.version);
 
@@ -94,7 +119,7 @@ export class ConsentsPage extends React.Component {
         label="Search"
         primary={true}
         keyboardFocused={true}
-        onClick={this.handleClose}
+        onClick={this.handleSearch.bind(this) }
       />,
     ];
 
@@ -120,6 +145,7 @@ export class ConsentsPage extends React.Component {
                     showBarcodes={true} 
                     noDataMessagePadding={100}
                     patient={ this.data.consentSearchFilter }
+                    query={ this.data.consentSearchQuery }
                     />
                  </Tab>
                  <Tab className="consentDetailTab" label='Detail' onActive={this.handleActive} style={this.data.style.tab} value={2}>
@@ -150,8 +176,8 @@ export class ConsentsPage extends React.Component {
                   name='givenName'
                   floatingLabelText='Given Name'
                   hintText='Jane'
-                  // value={ get(this, 'data.consent.name[0].text', '')}
-                  // onChange={ this.changeState.bind(this, 'name')}
+                  value={ get(this, 'state.searchForm.givenName', '')}
+                  onChange={ this.changeState.bind(this, 'givenName')}
                   floatingLabelFixed={true}
                   fullWidth
                   /><br/>
@@ -163,8 +189,8 @@ export class ConsentsPage extends React.Component {
                   name='familyName'
                   floatingLabelText='Family Name'
                   hintText='Doe'
-                  // value={ get(this, 'data.consent.name[0].text', '')}
-                  // onChange={ this.changeState.bind(this, 'name')}
+                  value={ get(this, 'state.searchForm.familyName', '')}
+                  onChange={ this.changeState.bind(this, 'familyName')}
                   floatingLabelFixed={true}
                   fullWidth
                   /><br/>
@@ -173,20 +199,22 @@ export class ConsentsPage extends React.Component {
             </Row>
             <SelectField
                 floatingLabelText="Category"
-                value={0}
-                // onChange={this.changeSelectedCategory.bind(this)}
+                value={ this.state.searchForm.category }
+                onChange={this.changeSelectedCategory.bind(this)}
                 fullWidth={true}
               >
                 <MenuItem value={0} primaryText="" />
-                <MenuItem value={1} primaryText="OAuth 2.0" />
-                <MenuItem value={2} primaryText="Illinois Consent by Minors to Medical Procedures" />
-                <MenuItem value={3} primaryText="42 CFR Part 2 Form of Written Consent" />
-                <MenuItem value={4} primaryText="Common rule informed consent" />
-                <MenuItem value={5} primaryText="Do Not Resuscitate" />
-                <MenuItem value={6} primaryText="HIPAA Authorization" />
-                <MenuItem value={7} primaryText="HIPAA Notice of Privacy Practices" />
-                <MenuItem value={8} primaryText="HIPAA Restrictions" />
-                <MenuItem value={9} primaryText="HIPAA Research Authorization" />
+                <MenuItem value={1} primaryText="Patient Authorization for Text Communications" />
+                <MenuItem value={2} primaryText="OAuth 2.0" />
+                <MenuItem value={3} primaryText="Do Not Resuscitate" />
+                <MenuItem value={4} disabled primaryText="Illinois Consent by Minors to Medical Procedures" />
+                <MenuItem value={5} disabled primaryText="42 CFR Part 2 Form of Written Consent" />
+                <MenuItem value={6} disabled primaryText="Common rule informed consent" />
+                <MenuItem value={7} disabled primaryText="HIPAA Authorization" />
+                <MenuItem value={8} disabled primaryText="HIPAA Notice of Privacy Practices" />
+                <MenuItem value={9} disabled primaryText="HIPAA Restrictions" />
+                <MenuItem value={10} disabled primaryText="HIPAA Research Authorization" />
+
                 {/* <MenuItem value={10} primaryText="HIPAA Self-Pay Restriction" />
                 <MenuItem value={11} primaryText="Research Information Access" />
                 <MenuItem value={12} primaryText="Authorization to Disclose Information to the Social Security Administration" />
@@ -198,7 +226,71 @@ export class ConsentsPage extends React.Component {
       </div>
     );
   }
+  changeSelectedCategory(event, value){
+    console.log('changeSelectedCategory', event, value)
+
+    let searchForm = this.state.searchForm;
+    searchForm.category = value;
+
+    this.setState({searchForm: searchForm})
+  }
+  updateFormData(formData, field, textValue){
+    if(process.env.NODE_ENV === "test") console.log("ConsentDetail.updateFormData", formData, field, textValue);
+
+    switch (field) {
+      case "givenName":
+        set(formData, 'givenName', textValue)
+        break;
+      case "familyName":
+        set(formData, 'familyName', textValue)
+        break;        
+      case "category":
+        set(formData, 'category', textValue)
+        break;
+    }
+
+    if(process.env.NODE_ENV === "test") console.log("formData", formData);
+    return formData;
+  }
+  updateSearch(consentData, field, textValue){
+    if(process.env.NODE_ENV === "test") console.log("ConsentDetail.updateConsent", consentData, field, textValue);
+
+    // switch (field) {
+    //   case "givenName":
+    //     set(consentData, 'givenName', textValue)
+    //     break;
+    //   case "familyName":
+    //     set(consentData, 'familyName', textValue)
+    //     break;        
+    //   case "category":
+    //     set(consentData, 'category.text', textValue)
+    //     break;  
+    // }
+    return consentData;
+  }
+  changeState(field, event, textValue){
+    if(process.env.NODE_ENV === "test") console.log("   ");
+    if(process.env.NODE_ENV === "test") console.log("ConsentDetail.changeState", field, textValue);
+    if(process.env.NODE_ENV === "test") console.log("this.state", this.state);
+
+    let searchForm = Object.assign({}, this.state.searchForm);
+    let searchQuery = Object.assign({}, this.state.searchQuery);
+
+    searchForm = this.updateFormData(searchForm, field, textValue);
+    searchQuery = this.updateSearch(searchQuery, field, textValue);
+
+    if(process.env.NODE_ENV === "test") console.log("searchQuery", searchQuery);
+    if(process.env.NODE_ENV === "test") console.log("searchForm", searchForm);
+
+    this.setState({searchQuery: searchQuery})
+    this.setState({searchForm: searchForm})
+  }
+
 }
+
+
+
+
 
 
 

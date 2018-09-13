@@ -35,6 +35,10 @@ export class ConsentTable extends React.Component {
       query['patient.display'] = this.props.patient;
     }
 
+    if(this.props.query){
+      query = this.props.query;
+    }
+
     let options = {};
     // number of items in the table should be set globally
     if (get(Meteor, 'settings.public.defaults.paginationLimit')) {
