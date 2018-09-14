@@ -58,7 +58,7 @@ export class ConsentTable extends React.Component {
         status: get(document, 'status', ''),
         patientReference: get(document, 'patient.display', ''),
         consentingParty: get(document, 'consentingParty[0].display', ''),
-        organization: get(document, 'organization.display', ''),
+        organization: get(document, 'organization[0].display', ''),
         policyRule: get(document, 'policyRule', ''),
         exceptType: get(document, 'except[0].type', ''),
         exceptAction: get(document, 'except[0].action[0].text', ''),
@@ -67,6 +67,10 @@ export class ConsentTable extends React.Component {
         end: get(document, 'period.end', ''),
         category: get(document, 'category[0].text', '')
       };
+
+      if(result.patientReference === ''){
+        result.patientReference = get(document, 'patient.reference', '');
+      }
 
       var exceptions;
       if(get(document, 'except.0.class')){

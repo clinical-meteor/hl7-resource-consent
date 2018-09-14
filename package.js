@@ -1,6 +1,6 @@
 Package.describe({
   name: 'clinical:hl7-resource-consent',
-  version: '3.4.8',
+  version: '3.4.9',
   summary: 'HL7 FHIR Resource - Consent',
   git: 'https://github.com/clinical-meteor/hl7-resource-consent',
   documentation: 'README.md'
