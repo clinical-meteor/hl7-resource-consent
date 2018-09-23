@@ -1,6 +1,8 @@
 
 import ConsentsPage from './client/ConsentsPage';
 import ConsentTable from './client/ConsentTable';
+import ProvenancesTable from './client/ProvenancesTable';
+import DocumentReferencesTable from './client/DocumentReferencesTable';
 import { Consent, Consents, ConsentSchema } from './lib/Consents';
 
 // let consent = require('../data/consent-example-smartonfhir.json');
@@ -33,7 +35,10 @@ export {
   DynamicRoutes, 
 
   ConsentsPage,
-  ConsentTable
+  ConsentTable,
+
+  ProvenancesTable,
+  DocumentReferencesTable
 };
 
 
