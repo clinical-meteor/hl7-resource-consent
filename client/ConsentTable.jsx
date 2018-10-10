@@ -114,6 +114,7 @@ export class ConsentTable extends React.Component {
   }
   handleVerify(id){
     console.log('handleVerify')
+    alert('Verify this Consent... (not implemented yet)')
   }
   renderIdentifier(identifier){
     if (!this.props.hideIdentifier) {
