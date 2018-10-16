@@ -39,6 +39,12 @@ export class ConsentsPage extends React.Component {
       searchQuery: {}
     }
   }
+  componentDidMount() {
+    if(get(this, 'props.params.consentId')){
+      Session.set('selectedConsentId', get(this, 'props.params.consentId'))
+      Session.set('consentPageTabIndex', 2);
+    }
+  }
   getMeteorData() {
     let data = {
       style: {
@@ -70,10 +76,13 @@ export class ConsentsPage extends React.Component {
       data.currentConsent = Session.get("selectedConsent");
     }
 
-    if (Session.get('selectedConsentId')){
-      data.selectedConsentId = Consents.findOne({_id: Session.get('selectedConsentId')});
+    if(get(this, 'props.params.consentId')){
+      data.selectedConsent = Consents.findOne({id: get(this, 'props.params.consentId')});
+      Session.set('consentPageTabIndex', 2);
+    } else if (Session.get('selectedConsentId')){
+      data.selectedConsent = Consents.findOne({_id: Session.get('selectedConsentId')});
     } else {
-      data.selectedConsentId = false;
+      data.selectedConsent = false;
     }
 
     data.style = Glass.blur(data.style);
@@ -108,6 +117,7 @@ export class ConsentsPage extends React.Component {
   }
   render() {
     console.log('React.version: ' + React.version);
+    console.log('ConsentsPage.this.props', this.props);
 
     const actions = [
       <FlatButton
@@ -144,8 +154,10 @@ export class ConsentsPage extends React.Component {
                    <ConsentTable 
                     showBarcodes={true} 
                     noDataMessagePadding={100}
+                    hideIdentifier={true}
                     patient={ this.data.consentSearchFilter }
                     query={ this.data.consentSearchQuery }
+                    sort="periodStart"
                     />
                  </Tab>
                  <Tab className="consentDetailTab" label='Detail' onActive={this.handleActive} style={this.data.style.tab} value={2}>
@@ -153,8 +165,8 @@ export class ConsentsPage extends React.Component {
                     id='consentDetails' 
                     fhirVersion={ this.data.fhirVersion }
                     consent={ this.data.selectedConsent }
-                    consentId={ this.data.selectedConsentId } />                     
-                    />
+                    consentId={ this.data.selectedConsentId } 
+                    />   
                  </Tab>
              </Tabs>
 

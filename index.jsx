@@ -9,6 +9,11 @@ import { Consent, Consents, ConsentSchema } from './lib/Consents';
 // console.log('consent', consent)
 
 var DynamicRoutes = [{
+  'name': 'ConsentIdPage',
+  'path': '/Consent/:consentId',
+  'component': ConsentsPage,
+  'requireAuth': true
+}, {
   'name': 'ConsentPage',
   'path': '/consents',
   'component': ConsentsPage,

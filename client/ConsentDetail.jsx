@@ -91,7 +91,7 @@ export class ConsentDetail extends React.Component {
       formData.dateTime = get(consent, 'dateTime')
       formData.patientDisplay = get(consent, 'patient.display')    
       formData.consentingParty = get(consent, 'consentingParty[0].display')
-      formData.organizationDisplay = get(consent, 'organization.display')
+      formData.organizationDisplay = get(consent, 'organization[0].display')
       formData.periodStart = get(consent, 'period.start')
       formData.periodEnd = get(consent, 'period.end')
       formData.type = get(consent, 'except[0].type')
@@ -323,7 +323,7 @@ export class ConsentDetail extends React.Component {
                 name='dateTime'
                 type='date'
                 floatingLabelText='Signed On'
-                value={ get(formData, 'dateTime', '')}
+                value={ moment(get(formData, 'dateTime', '')).format('YYYY-MM-DD') }
                 onChange={ this.changeState.bind(this, 'dateTime')}
                 floatingLabelFixed={true}
                 fullWidth

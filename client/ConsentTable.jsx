@@ -42,6 +42,21 @@ export class ConsentTable extends React.Component {
     }
 
     let options = {};
+
+    if(this.props.sort){
+
+      switch (this.props.sort) {
+        case "date":
+          options.sort = { dateTime: -1 }
+          break;
+        case "periodStart":
+          options.sort = { 'period.start': -1 }
+          break;      
+        default:
+          break;
+      }
+    }
+
     // number of items in the table should be set globally
     if (get(Meteor, 'settings.public.defaults.paginationLimit')) {
       options.limit = get(Meteor, 'settings.public.defaults.paginationLimit');
@@ -56,7 +71,7 @@ export class ConsentTable extends React.Component {
     data.consents = Consents.find(query, options).map(function(document){
       let result = {
         _id: document._id,
-        dateTime: moment(get(document, 'dateTime', null)).format("YYYY-MM-DD"),
+        dateTime: moment(get(document, 'dateTime', null)).format("YYYY-MM-DD hh:mm:ss"),
         status: get(document, 'status', ''),
         patientReference: get(document, 'patient.display', ''),
         consentingParty: get(document, 'consentingParty[0].display', ''),
@@ -65,8 +80,8 @@ export class ConsentTable extends React.Component {
         exceptType: get(document, 'except[0].type', ''),
         exceptAction: get(document, 'except[0].action[0].text', ''),
         exceptClass: get(document, 'except[0].class', ''),
-        start: moment(get(document, 'period.start', '')).format("YYYY-MM-DD"),
-        end: moment(get(document, 'period.end', '')).format("YYYY-MM-DD"),
+        start: moment(get(document, 'period.start', '')).format("YYYY-MM-DD hh:mm:ss"),
+        end: moment(get(document, 'period.end', '')).format("YYYY-MM-DD hh:mm:ss"),
         sourceReference: get(document, 'sourceReference.reference', ''),
         category: get(document, 'category[0].text', '')
       };
@@ -112,10 +127,10 @@ export class ConsentTable extends React.Component {
   handleRevoke(id){
     console.log('handleRevoke')
   }
-  handleVerify(id){
-    console.log('handleVerify')
-    alert('Verify this Consent... (not implemented yet)')
-  }
+  // handleVerify(id){
+  //   console.log('handleVerify')
+  //   alert('Verify this Consent... (not implemented yet)')
+  // }
   renderIdentifier(identifier){
     if (!this.props.hideIdentifier) {
       return (
@@ -244,22 +259,22 @@ export class ConsentTable extends React.Component {
 
 
 
-  renderVerify(){
-    if (!this.props.hideVerify) {
-      return (
-        <td className='revoke'>
-          <FlatButton label="Verify" onClick={this.handleVerify.bind(this)} />
-        </td>
-      );
-    }
-  }
-  renderVerifyHeader(){
-    if (!this.props.hideVerify) {
-      return (
-        <th className='end' style={{minWidth: '100px', marginLeft: '20px'}}> Verify </th>
-      );
-    }
-  }
+  // renderVerify(){
+  //   if (!this.props.hideVerify) {
+  //     return (
+  //       <td className='revoke'>
+  //         <FlatButton label="Verify" onClick={this.handleVerify.bind(this)} />
+  //       </td>
+  //     );
+  //   }
+  // }
+  // renderVerifyHeader(){
+  //   if (!this.props.hideVerify) {
+  //     return (
+  //       <th className='end' style={{minWidth: '100px', marginLeft: '20px'}}> Verify </th>
+  //     );
+  //   }
+  // }
 
 
   renderRevoke(){
@@ -283,7 +298,15 @@ export class ConsentTable extends React.Component {
 
     Session.set('selectedDocumentSource', sourceReference);
   }
-
+  onPatientClick(id){
+    if(this.props.onPatientClick){
+      this.props.onPatientClick(id);
+    } else {
+      Session.set('consentsUpsert', false);
+      Session.set('selectedConsent', id);
+      Session.set('consentPageTabIndex', 2);  
+    }
+  }
   render () {
     let tableRows = [];
     let footer;
@@ -305,31 +328,16 @@ export class ConsentTable extends React.Component {
             {this.renderPeriodStart(get(this.data.consents[i], '_id'), get(this.data.consents[i], 'start'))}
             {this.renderPeriodEnd(get(this.data.consents[i], '_id'), get(this.data.consents[i], 'end'))}
 
-            {/* <td className='identifier barcode' style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.consents[i]._id }</td> */}
-  
-            {/* <td className='date' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.consents[i].dateTime }</td> */}
-            <td className='status' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell}>{this.data.consents[i].status}</td>
-            <td className='patientReference' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell} >{this.data.consents[i].patientReference }</td>
+            <td className='status' onClick={ this.rowClick.bind(this, this.data.consents[i]._id)} style={this.data.style.cell}>{this.data.consents[i].status}</td>
+            <td className='patientReference' onClick={ this.onPatientClick.bind(this, this.data.consents[i]._id)} style={this.data.style.cell} >{this.data.consents[i].patientReference }</td>
             <td className='organization' style={this.data.style.cell} >{this.data.consents[i].organization}</td>
-
-            {/* <td className='consentingParty' onClick={ this.rowClick.bind('this', this.data.consents[i]._id)} style={this.data.style.cell} >{this.data.consents[i].consentingParty}</td> */}
-            {/* <td className='policyRule' style={this.data.style.cell} >{this.data.consents[i].policyRule}</td> */}
-            {/* <td className='exceptAction' style={this.data.style.cell} >{this.data.consents[i].exceptAction}</td> */}
-
-            {/* <td className='exceptType' style={this.data.style.cell} >{this.data.consents[i].exceptType}</td> */}
-            {/* <td className='exceptClass' style={this.data.style.cell} >{this.data.consents[i].exceptClass}</td> */}
-            {/* <td className='category' style={this.data.style.cell} >{this.data.consents[i].category}</td> */}
 
             {this.renderType( get(this.data.consents[i], 'exceptType')) }
             {this.renderClass( get(this.data.consents[i], 'exceptClass')) }
             {this.renderCategory( get(this.data.consents[i], 'category')) }
             {this.renderSource(get(this.data.consents[i], 'sourceReference')) }
-            {this.renderVerify() }
             {this.renderRevoke() }
 
-            {/* <td className='revoke'>
-              <FlatButton label="Revoke" onClick={this.handleRevoke.bind(this)} />
-            </td> */}
           </tr>
         );
       }  
@@ -345,24 +353,14 @@ export class ConsentTable extends React.Component {
               {this.renderDateHeader() }
               {this.renderPeriodStartHeader() }
               {this.renderPeriodEndHeader() }
-              {/* <th className='identifier'>Identifier</th> */}
-              {/* <th className='name' style={{minWidth: '100px'}}>Date</th> */}
               <th className='status'>Status</th>
               <th className='patientReference'>Patient</th>
               <th className='organization' >Organization</th>
-              {/* <th className='consentingParty' >consenting party</th> */}
-              {/* <th className='rule' >rule</th> */}
-              {/* <th className='action' >action</th> */}
               {this.renderTypeHeader() }
               {this.renderClassHeader() }
               {this.renderCategoryHeader() }
               {this.renderSourceHeader() }
-              {/* <th className='type' >Type</th> */}
-              {/* <th className='class' >Class</th> */}
-              {/* <th className='category' >Category</th> */}
-              {this.renderVerifyHeader() }
               {this.renderRevokeHeader() }
-              {/* <th className='revoke' >Revoke</th> */}
             </tr>
           </thead>
           <tbody>
@@ -388,7 +386,14 @@ ConsentTable.propTypes = {
   hideVerify: PropTypes.bool,
   hideRevoke: PropTypes.bool,
   sourceReference: PropTypes.bool,
-  disableBarcodes: PropTypes.bool
+  disableBarcodes: PropTypes.bool,
+  limit: PropTypes.number,
+  query: PropTypes.object,
+  patient: PropTypes.string,
+  patientDisplay: PropTypes.string,
+  sort: PropTypes.string,
+  selectedDocumentSource: PropTypes.string,
+  onPatientClick: PropTypes.func
 };
 
 ReactMixin(ConsentTable.prototype, ReactMeteorData);
