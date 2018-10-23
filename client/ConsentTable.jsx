@@ -131,6 +131,23 @@ export class ConsentTable extends React.Component {
   //   console.log('handleVerify')
   //   alert('Verify this Consent... (not implemented yet)')
   // }
+
+
+  renderSelected(exceptType){
+    if (!this.props.hideSelected) {
+      return (
+        <td className='selected'  style={{minWidth: '100px', paddingTop: '16px'}}><Checkbox /></td>
+      );
+    }
+  }
+  renderSelectedHeader(){
+    if (!this.props.hideSelected) {
+      return (
+        <th className='selected'>Selected</th>
+      );
+    }
+  }
+
   renderIdentifier(identifier){
     if (!this.props.hideIdentifier) {
       return (
@@ -322,7 +339,7 @@ export class ConsentTable extends React.Component {
       for (var i = 0; i < this.data.consents.length; i++) {
         tableRows.push(
           <tr key={i} className="consentRow" style={{cursor: "pointer"}}>
-            <td className='selected'  style={{minWidth: '100px', paddingTop: '16px'}}><Checkbox /></td>
+            {this.renderSelected()}
             {this.renderIdentifier(get(this.data.consents[i], 'identifier'))}
             {this.renderDate(get(this.data.consents[i], '_id'), get(this.data.consents[i], 'date'))}
             {this.renderPeriodStart(get(this.data.consents[i], '_id'), get(this.data.consents[i], 'start'))}
@@ -348,7 +365,7 @@ export class ConsentTable extends React.Component {
         <Table id='consentsTable' hover >
           <thead>
             <tr>
-              <th className='selected'>Selected</th>
+              {this.renderSelectedHeader() }
               {this.renderIdentifierHeader() }
               {this.renderDateHeader() }
               {this.renderPeriodStartHeader() }
