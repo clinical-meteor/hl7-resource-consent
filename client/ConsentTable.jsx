@@ -71,6 +71,7 @@ export class ConsentTable extends React.Component {
     data.consents = Consents.find(query, options).map(function(document){
       let result = {
         _id: document._id,
+        id: get(document, 'id', ''),
         dateTime: moment(get(document, 'dateTime', null)).format("YYYY-MM-DD hh:mm:ss"),
         status: get(document, 'status', ''),
         patientReference: get(document, 'patient.display', ''),
@@ -147,7 +148,20 @@ export class ConsentTable extends React.Component {
       );
     }
   }
-
+  renderId(id){
+    if (!this.props.hideId) {
+      return (
+        <td className="id hidden-on-phone">{ id }</td>
+      );
+    }
+  }
+  renderIdHeader(){
+    if (!this.props.hideId) {
+      return (
+        <th className="id" >Id</th>
+      );
+    }
+  }
   renderIdentifier(identifier){
     if (!this.props.hideIdentifier) {
       return (
@@ -340,6 +354,7 @@ export class ConsentTable extends React.Component {
         tableRows.push(
           <tr key={i} className="consentRow" style={{cursor: "pointer"}}>
             {this.renderSelected()}
+            {this.renderId(get(this.data.consents[i], 'id'))}
             {this.renderIdentifier(get(this.data.consents[i], 'identifier'))}
             {this.renderDate(get(this.data.consents[i], '_id'), get(this.data.consents[i], 'date'))}
             {this.renderPeriodStart(get(this.data.consents[i], '_id'), get(this.data.consents[i], 'start'))}
@@ -366,6 +381,7 @@ export class ConsentTable extends React.Component {
           <thead>
             <tr>
               {this.renderSelectedHeader() }
+              {this.renderIdHeader() }
               {this.renderIdentifierHeader() }
               {this.renderDateHeader() }
               {this.renderPeriodStartHeader() }
