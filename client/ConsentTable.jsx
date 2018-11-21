@@ -151,7 +151,7 @@ export class ConsentTable extends React.Component {
   renderId(id){
     if (!this.props.hideId) {
       return (
-        <td className="id hidden-on-phone">{ id }</td>
+        <td className="id hidden-on-phone" onClick={ this.onIdentifierClick.bind(this, id)} >{ id }</td>
       );
     }
   }
@@ -403,6 +403,11 @@ export class ConsentTable extends React.Component {
       { footer }
       </div>
     );
+  }
+  onIdentifierClick(id){
+    if(typeof this.props.onIdentifierClick === "function"){
+      this.props.onIdentifierClick(id);
+    } 
   }
 }
 
