@@ -218,6 +218,11 @@ JsonRoutes.add("get", "/" + fhirVersion + "/Consent/:id", function (req, res, ne
 
         process.env.TRACE && console.log('consentData', consentData);
 
+        // X-Provenance Header
+        // https://www.hl7.org/fhir/provenance.html#header
+        let xProvenance = Provenances.findOne({'target.reference': req.params.id});
+        res.setHeader("X-Provenance", JSON.stringify(xProvenance));
+
         // Success
         JsonRoutes.sendResult(res, {
           code: 200,
