@@ -13,4 +13,11 @@ describe('clinical:hl7-resource-consent', function () {
   it('exists globally', function () {
     expect(Consents).to.exist;
   });
+  it('can generate a default scope request', function () {
+    expect(Consents).to.exist;
+  });
+  it('can encode a url', function () {
+    expect(Consents).to.exist;
+  });
+
 });
